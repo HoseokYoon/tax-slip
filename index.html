@@ -1,0 +1,142 @@
+<!doctype html>
+<html lang="ko">
+<head>
+  <meta charset="utf-8" />
+  <title>원천징수영수증 조회</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+
+  <style>
+    body {
+      font-family: system-ui, -apple-system, Segoe UI, Roboto, sans-serif;
+      background: #f6f7f9;
+      margin: 0;
+      padding: 24px;
+    }
+    .wrap {
+      max-width: 520px;
+      margin: 0 auto;
+    }
+    .card {
+      background: #fff;
+      border-radius: 14px;
+      padding: 20px;
+      box-shadow: 0 6px 20px rgba(0,0,0,0.08);
+    }
+    h1 {
+      margin: 0 0 8px;
+      font-size: 22px;
+    }
+    .desc {
+      font-size: 14px;
+      color: #666;
+      margin-bottom: 16px;
+    }
+    label {
+      display: block;
+      margin-top: 14px;
+      font-weight: 600;
+      font-size: 14px;
+    }
+    input {
+      width: 100%;
+      padding: 12px;
+      margin-top: 6px;
+      font-size: 16px;
+      border-radius: 8px;
+      border: 1px solid #ccc;
+    }
+    button {
+      width: 100%;
+      margin-top: 18px;
+      padding: 12px;
+      font-size: 16px;
+      font-weight: 600;
+      border-radius: 10px;
+      border: none;
+      cursor: pointer;
+      background: #2563eb;
+      color: #fff;
+    }
+    button:hover {
+      background: #1d4ed8;
+    }
+    .msg {
+      margin-top: 12px;
+      font-size: 14px;
+      color: #444;
+    }
+    iframe {
+      margin-top: 18px;
+      width: 100%;
+      height: 75vh;
+      border: 1px solid #ddd;
+      border-radius: 12px;
+      background: #fafafa;
+    }
+    .footer {
+      margin-top: 14px;
+      font-size: 12px;
+      color: #888;
+      text-align: center;
+    }
+  </style>
+</head>
+
+<body>
+  <div class="wrap">
+    <div class="card">
+      <h1>원천징수영수증 조회</h1>
+      <div class="desc">
+        이름과 생년월일(YYMMDD)을 입력하면<br />
+        본인 원천징수영수증만 표시됩니다.
+      </div>
+
+      <label for="name">이름</label>
+      <input id="name" placeholder="예: 홍길동" autocomplete="name" />
+
+      <label for="dob">생년월일 (YYMMDD)</label>
+      <input id="dob" placeholder="예: 900101" maxlength="6" inputmode="numeric" />
+
+      <button id="btn">조회하기</button>
+
+      <div id="msg" class="msg"></div>
+
+      <iframe id="viewer" title="PDF Viewer"></iframe>
+    </div>
+
+    <div class="footer">
+      © 2025 · 개인정보 입력 후 자동으로 문서가 표시됩니다
+    </div>
+  </div>
+
+  <script>
+    const $ = (id) => document.getElementById(id);
+
+    function normalizeName(v) {
+      return (v || "").replace(/\s+/g, "").trim();
+    }
+    function normalizeDob(v) {
+      return (v || "").replace(/\D/g, "").slice(0, 6);
+    }
+
+    $("btn").addEventListener("click", () => {
+      $("msg").textContent = "";
+
+      const name = normalizeName($("name").value);
+      const dob  = normalizeDob($("dob").value);
+
+      if (!name || dob.length !== 6) {
+        $("msg").textContent = "이름과 생년월일 6자리를 정확히 입력해 주세요.";
+        return;
+      }
+
+      // 👉 나중에 서버/서버리스가 처리할 API 주소
+      const url =
+        `/api/get-slip?name=${encodeURIComponent(name)}&dob=${encodeURIComponent(dob)}`;
+
+      $("viewer").src = url;
+      $("msg").textContent = "문서를 불러오는 중입니다…";
+    });
+  </script>
+</body>
+</html>
